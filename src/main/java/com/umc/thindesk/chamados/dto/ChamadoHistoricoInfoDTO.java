@@ -25,6 +25,9 @@ public record ChamadoHistoricoInfoDTO(
     }
 
     public static List<ChamadoHistoricoInfoDTO> mapAll(List<ChamadoHistorico> lista) {
+        if (lista == null)
+            return List.of();
+        
         return lista.stream()
                 .map(ChamadoHistoricoInfoDTO::from)
                 .toList();
