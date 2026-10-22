@@ -6,11 +6,14 @@ import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.umc.thindesk.chamados.dto.ChamadoRegisterDTO;
 import com.umc.thindesk.chamados.entity.Chamado;
 import com.umc.thindesk.chamados.entity.ChamadoStatus;
+import com.umc.thindesk.chamados.exception.ChamadoAlreadyResolveException;
+import com.umc.thindesk.chamados.exception.ChamadoNotFoundException;
 import com.umc.thindesk.chamados.repository.ChamadoHistoricoRepository;
 import com.umc.thindesk.chamados.repository.ChamadoRepository;
 
@@ -37,6 +40,18 @@ public class ChamadoService {
     public Chamado findById(String id) {
         return chamadoRepository.findById(id)
                 .orElseThrow(() -> new ChamadoNotFoundException());
+    }
+
+    public void resolve(String id) {
+        // TODO adicionar histórico
+        Chamado chamado = this.findById(id);
+
+        if (chamado.getStatus().equals(ChamadoStatus.RESOLVIDO)) 
+            throw new ChamadoAlreadyResolveException();
+
+        
+        chamado.setStatus(ChamadoStatus.RESOLVIDO);
+        chamadoRepository.save(chamado);
     }
 
 }
