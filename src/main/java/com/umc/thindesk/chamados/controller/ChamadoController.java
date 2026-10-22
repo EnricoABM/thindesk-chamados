@@ -41,4 +41,10 @@ public class ChamadoController {
                 .toUri();
     }
 
+    @GetMapping("/{id}")
+    public ChamadoInfoDTO findById(@PathVariable String id) {
+        return ChamadoInfoDTO.from(chamadoService.findById(id));
+    }
+    
+
 }
