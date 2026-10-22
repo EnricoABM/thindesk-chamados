@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: chamados
+  data:
+    mongodb:
+      auto-index-creation: true
+  mongodb:
+    uri: mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@localhost:27017/thindesk?authSource=admin
+    database: thindesk
+  config:
+    import: optional:file:.env[.properties]
+  
