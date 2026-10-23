@@ -53,15 +53,31 @@ public class ChamadoService {
         chamado.setTecnico(dto.tecnico());
         chamado.setStatus(ChamadoStatus.RESOLVIDO);
         chamadoRepository.save(chamado);
-        historicoService.save(dto.tecnico(), estadoAnterior, ChamadoStatus.RESOLVIDO);
+        historicoService.save(dto.tecnico(), chamado, estadoAnterior, ChamadoStatus.RESOLVIDO);
     }
 
     public List<Chamado> findAllBySolicitente(String id, int page, int size, String order) {
-        return chamadoRepository.findAllBySolicitante(id, PageRequest.of(page, size, Sort.by(order)));
+        List<Chamado> lista = chamadoRepository.findAllBySolicitante(id, PageRequest.of(page, size, Sort.by(order)))
+                .stream()
+                .map((chamado) -> {
+                    chamado.setHistorico(
+                            historicoService.findAllByChamado(chamado.getId()));
+                    return chamado;
+                })
+                .toList();
+        return lista;
     }
 
     public List<Chamado> findAllBySolicitente(String id) {
-        return chamadoRepository.findAllBySolicitante(id);
+        List<Chamado> lista = chamadoRepository.findAllBySolicitante(id)
+                .stream()
+                .map((chamado) -> {
+                    chamado.setHistorico(
+                            historicoService.findAllByChamado(chamado.getId()));
+                    return chamado;
+                })
+                .toList();
+        return lista;
     }
 
 }

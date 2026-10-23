@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.umc.thindesk.chamados.entity.Chamado;
 import com.umc.thindesk.chamados.entity.ChamadoHistorico;
 import com.umc.thindesk.chamados.entity.ChamadoStatus;
 import com.umc.thindesk.chamados.repository.ChamadoHistoricoRepository;
@@ -21,11 +22,12 @@ public class ChamadoHistoricoService {
         this.chamadoRepository = chamadoRepository;
     }
 
-    public ChamadoHistorico save(String usuario, ChamadoStatus estadoAnterior, ChamadoStatus estadoAtual) {
+    public ChamadoHistorico save(String usuario, Chamado chamado, ChamadoStatus estadoAnterior, ChamadoStatus estadoAtual) {
         ChamadoHistorico chamadoHistorico = ChamadoHistorico.builder()
             .id(null)
             .usuario(usuario)
             .data(LocalDateTime.now())
+            .chamado(chamado)
             .estadoAnterior(estadoAnterior)
             .estadoAtual(estadoAtual)
             .build();
