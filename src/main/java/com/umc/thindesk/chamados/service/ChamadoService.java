@@ -1,15 +1,14 @@
 package com.umc.thindesk.chamados.service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.umc.thindesk.chamados.dto.ChamadoRegisterDTO;
+import com.umc.thindesk.chamados.dto.ChamadoResolveDTO;
 import com.umc.thindesk.chamados.entity.Chamado;
 import com.umc.thindesk.chamados.entity.ChamadoStatus;
 import com.umc.thindesk.chamados.exception.ChamadoAlreadyResolveException;
@@ -21,16 +20,16 @@ import com.umc.thindesk.chamados.repository.ChamadoRepository;
 public class ChamadoService {
 
     private final ChamadoRepository chamadoRepository;
-    private final ChamadoHistoricoRepository historicoRepository;
+    private final ChamadoHistoricoService historicoService;
 
-    public ChamadoService(ChamadoRepository chamadoRepository, ChamadoHistoricoRepository historicoRepository) {
+    public ChamadoService(ChamadoRepository chamadoRepository, ChamadoHistoricoRepository historicoRepository,
+            ChamadoHistoricoService historicoService) {
         this.chamadoRepository = chamadoRepository;
-        this.historicoRepository = historicoRepository;
+        this.historicoService = historicoService;
+
     }
 
     public Chamado save(ChamadoRegisterDTO dto) {
-        // TODO registrar historico
-
         Chamado model = dto.toModel();
         model.setStatus(ChamadoStatus.ABERTO);
         model.setData(LocalDateTime.now());
@@ -42,16 +41,27 @@ public class ChamadoService {
                 .orElseThrow(() -> new ChamadoNotFoundException());
     }
 
-    public void resolve(String id) {
-        // TODO adicionar histórico
+    public void resolve(String id, ChamadoResolveDTO dto) {
         Chamado chamado = this.findById(id);
 
-        if (chamado.getStatus().equals(ChamadoStatus.RESOLVIDO)) 
+        if (chamado.getStatus().equals(ChamadoStatus.RESOLVIDO))
             throw new ChamadoAlreadyResolveException();
 
-        
+        ChamadoStatus estadoAnterior = chamado.getStatus();
+
+        chamado.setResolucao(dto.resolucao());
+        chamado.setTecnico(dto.tecnico());
         chamado.setStatus(ChamadoStatus.RESOLVIDO);
         chamadoRepository.save(chamado);
+        historicoService.save(dto.tecnico(), estadoAnterior, ChamadoStatus.RESOLVIDO);
+    }
+
+    public List<Chamado> findAllBySolicitente(String id, int page, int size, String order) {
+        return chamadoRepository.findAllBySolicitante(id, PageRequest.of(page, size, Sort.by(order)));
+    }
+
+    public List<Chamado> findAllBySolicitente(String id) {
+        return chamadoRepository.findAllBySolicitante(id);
     }
 
 }

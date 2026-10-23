@@ -8,4 +8,6 @@ import com.umc.thindesk.chamados.entity.ChamadoHistorico;
 
 public interface ChamadoHistoricoRepository extends MongoRepository<ChamadoHistorico, String> {
     List<ChamadoHistorico> findByUsuario(String usuario);
+
+    List<ChamadoHistorico> findAllByChamado(String chamado);
 }

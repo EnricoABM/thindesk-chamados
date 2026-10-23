@@ -20,15 +20,17 @@ public class Chamado {
     @Id
     private String id;
 
+    private String titulo;
+
     private String descricao;
 
     private LocalDateTime data;
 
-    private ChamadoTipo tipo;
-
     private String solicitante;
 
     private String tecnico;
+
+    private String resolucao;
 
     private ChamadoStatus status;
 
